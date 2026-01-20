@@ -258,7 +258,7 @@ async def chat_customer(request: ChatRequest):
         history = load_history(user_id=user_id, conversation_id=conversation_id, table_name=TABLE_NAME)
         
         # 5. Build prompt with CLIENT system prompt
-        context_text = "\n\n".join([f"Source: {doc['metadata'].get('source', 'Unknown')}\nContent: {doc['content']}" for doc in context_docs])
+        context_text = "\n\n".join([f"Source: {doc.get('meta', {}).get('source', 'Unknown')}\nContent: {doc.get('text', '')}" for doc in context_docs])
         
         full_prompt = f"{CLIENT_SYSTEM_PROMPT}\n\nRELEVANT LEGAL CONTEXT:\n{context_text}\n\n"
         if history:
@@ -287,6 +287,38 @@ async def chat_customer(request: ChatRequest):
         print(f"[Client API] Error: {e}")
         print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/customer/suggested-questions")
+async def get_customer_suggested_questions():
+    """
+    Get suggested legal questions for Pakistani clients
+    """
+    return [
+        {
+            "category": "Civil Law",
+            "questions": [
+                "How do I write a legal notice?",
+                "What is Section 144?",
+                "How can I file a case in civil court?"
+            ]
+        },
+        {
+            "category": "Property",
+            "questions": [
+                "What is the procedure for property transfer?",
+                "How to verify a land registry (Fard)?",
+                "What are the rights of a tenant?"
+            ]
+        },
+        {
+            "category": "Family Law",
+            "questions": [
+                "How to apply for a Nikahnama copy?",
+                "What is the procedure for Khula?",
+                "How is child custody determined in Pakistan?"
+            ]
+        }
+    ]
 
 # Get history endpoint
 @app.get("/api/history", response_model=HistoryResponse)
