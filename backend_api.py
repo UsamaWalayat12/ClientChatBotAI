@@ -248,7 +248,7 @@ async def chat_customer(request: ChatRequest):
         # If no conversation_id, create a new one
         if not conversation_id:
             conversation_id = f"client_{uuid.uuid4().hex[:8]}"
-            print(f"[Client API] Starting new conversation: {conversation_id}")
+            print(f"[Client API][V2-FIXED] Starting new conversation: {conversation_id}")
             
         # 3. Retrieve context
         print(f"[Client API] Query: {request.query}")
